@@ -6,7 +6,7 @@
 ![picture 1](https://i.imgur.com/OmQLNTa.png)  
 
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Backend
 
@@ -28,18 +28,18 @@
 | HTTP Client & Real-time | Axios, Socket.io-Client |
 
 
-## 📊 Alur Integrasi Data
+## Alur Integrasi Data
 
 1. **Hardware Ingestion:** Hardware Receiver ESP32 mengirimkan paket data sensor relawan melalui USB Serial ke Laptop Posko.
 2. **Backend Processing (`BackEnd`):**
-* `serialService.js` membaca dan melakuakan *parsing* data serial.
+* `serialService.js` membaca dan melakukan *parsing* data serial.
 * Data diproses oleh modul terkait, lalu disimpan ke database MySQL.
 * `socket.js` memancarkan (*broadcast*) update data terbaru via **Socket.io**.
 3. **Frontend Rendering (`FrontEnd`):**
 * **Initial Load:** React memanggil REST API (Axios) untuk mengunduh data histori awal dari MySQL.
 * **Live Monitoring:** Component UI melakukan *listening* ke WebSocket untuk pembaruan *real-time*.
 
-## ⚙️ Panduan Menjalankan Aplikasi
+## Panduan Menjalankan Aplikasi
 
 ### Prasyarat
 
@@ -85,7 +85,7 @@ npm run dev
 Akses dashboard melalui browser di `http://localhost:5173` (atau port yang ditampilkan Vite).
 
 
-## 📝 Catatan Teknis Development
+## Catatan Teknis Development
 
 * **Offline-First:** Seluruh dependensi UI dan backend berjalan lokal di Laptop Posko tanpa memerlukan koneksi internet.
 * **Handling Multi-Component:** Pembagian *state management* dan interface TypeScript pada frontend diletakkan dalam folder `src/types/` (`alert.ts`, `vital-sign.ts`, `volunteer.ts`) untuk memastikan konsistensi struktur data yang diterima dari backend.
