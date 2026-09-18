@@ -1,6 +1,10 @@
-/node_modules
-/.next/
-/build
+# General ignore rules
+node_modules/
 .env*
 *.log
 .DS_Store
+
+# Build outputs
+dist/
+build/
+.next/
