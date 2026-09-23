@@ -73,6 +73,7 @@ export default function App() {
               y: newData.y,
               fall_detected: newData.fall_detected,
               activity_status: newData.activity_status,
+              fatigue_score: newData.fatigue_score,
               status: newData.severity ?? vol.status,
               timestamp: newData.timestamp,
             };

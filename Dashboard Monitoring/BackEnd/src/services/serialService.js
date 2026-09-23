@@ -90,6 +90,7 @@ const processIncomingData = async (rawData) => {
             if (shouldCreateAlert) {
                 const alertData = {
                     volunteer_id: volunteer.volunteer_id,
+                    volunteer_name: volunteer.name,
                     type,
                     severity,
                     fatigue_score,

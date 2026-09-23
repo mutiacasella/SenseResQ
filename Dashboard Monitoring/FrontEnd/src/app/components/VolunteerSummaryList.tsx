@@ -112,8 +112,8 @@ export function VolunteerSummaryList({ volunteers, selectedVolunteerId, onSelect
                   </td>
                   <td className="px-3 py-2">
                     <div className="flex items-center gap-1.5">
-                      <Activity className={`w-3.5 h-3.5 ${volunteer.fall_detected ? 'text-red-600' : volunteer.activity_status === 'aktif' ? 'text-green-600' : 'text-gray-500'}`} />
-                      <span className={`text-sm ${volunteer.fall_detected ? 'text-red-600 font-semibold' : volunteer.activity_status === 'aktif' ? 'text-green-600' : 'text-gray-600'}`}>
+                      <Activity className={`w-3.5 h-3.5 ${volunteer.fall_detected ? 'text-red-600' : volunteer.activity_status === 'Active' ? 'text-green-600' : 'text-gray-500'}`} />
+                      <span className={`text-sm ${volunteer.fall_detected ? 'text-red-600 font-semibold' : volunteer.activity_status === 'Active' ? 'text-green-600' : 'text-gray-600'}`}>
                         {volunteer.activity_status}
                       </span>
                     </div>

@@ -85,6 +85,27 @@ const createMonitoringData = async (req, res) => {
     }
 };
 
+// Menerima data sensor dari simulator dan meneruskannya ke processIncomingData
+const simulateMonitoringData = async (req, res) => {
+    try {
+        const { processIncomingData } = require("../../services/serialService");
+        await processIncomingData(req.body);
+
+        return res.status(200).json({
+            success: true,
+            message: "Simulator data processed successfully",
+        });
+    }
+    catch (error) {
+        console.error(error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
 // Mengambil data monitoring terbaru dari setiap perangkat
 const getLatestMonitoringData = async (req, res) => {
     try {
@@ -130,6 +151,7 @@ const getMonitoringHistory = async (req, res) => {
 
 module.exports = {
     createMonitoringData,
+    simulateMonitoringData,
     getLatestMonitoringData,
     getMonitoringHistory,
 };
