@@ -4,10 +4,12 @@
     "start": "nodemon src/index.js"
   },
   "dependencies": {
+    "@serialport/parser-readline": "^13.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "mysql2": "^3.23.1",
+    "serialport": "^13.0.0",
     "socket.io": "^4.8.3",
     "socket.io-client": "^4.8.3"
   },

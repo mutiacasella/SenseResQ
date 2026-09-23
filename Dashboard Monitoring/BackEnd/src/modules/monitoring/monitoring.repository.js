@@ -73,8 +73,19 @@ const getMonitoringHistory = async (deviceId) => {
     return rows;
 };
 
+// Mengecek apakah device_id terdaftar di tabel device
+const deviceExists = async (deviceId) => {
+    const [rows] = await pool.query(
+        "SELECT 1 FROM Device WHERE device_id = ? LIMIT 1",
+        [deviceId]
+    );
+
+    return rows.length > 0;
+};
+
 module.exports = {
     createMonitoringData,
     getLatestMonitoringData,
     getMonitoringHistory,
+    deviceExists,
 };

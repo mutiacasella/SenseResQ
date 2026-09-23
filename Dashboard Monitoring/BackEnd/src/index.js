@@ -12,6 +12,8 @@ const volunteerRoutes = require("./modules/volunteer/volunteer.route");
 const monitoringRoutes = require("./modules/monitoring/monitoring.route");
 const alertRoutes = require("./modules/alert/alert.route");
 
+const { initSerial } = require("./services/serialService");
+
 const app = express();
 const server = http.createServer(app);
 
@@ -48,6 +50,9 @@ io.on("connection", (socket) => {
 app.get("/", (req, res) => {
     res.send("SenseResQ Backend is running!");
 });
+
+// Inisialisasi serial listener (atau mock mode)
+initSerial();
 
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

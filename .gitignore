@@ -1,6 +1,7 @@
 # General ignore rules
 node_modules/
 .env*
+!.env.example
 *.log
 .DS_Store
 
