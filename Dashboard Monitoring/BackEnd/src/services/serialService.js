@@ -39,7 +39,19 @@ const processIncomingData = async (rawData) => {
         console.log("Received data:", rawData);
 
         // Ambil latitude dan longitude mentah dari GPS, dan kumpulan data lainnya
-        const { device_id, heart_rate, spo2, temperature, latitude, longitude, fall_detected, activity_status } = rawData;
+        const { 
+            device_id, 
+            heart_rate, 
+            spo2, 
+            temperature, 
+            latitude, 
+            longitude, 
+            fall_detected, 
+            activity_status,
+            test_id, // metadata pengujian
+            sent_at  // metadata pengujian
+        } = rawData;
+
         const timestamp = new Date();
 
         // Validasi device_id ada di tabel Device
@@ -74,11 +86,15 @@ const processIncomingData = async (rawData) => {
 
         // Kirim data monitoring baru secara real-time melalui WebSocket
         const io = getIO();
+
         io.emit("monitoring:new", {
             monitoring_id: monitoringId,
             ...monitoringDataToSave,
             fatigue_score,
             severity,
+
+            // Metadata pengujian
+            test_id: rawData.test_id,
         });
 
         // Cek relawan terkait dan buat peringatan jika threshold terlewati
@@ -99,6 +115,9 @@ const processIncomingData = async (rawData) => {
                     temperature,
                     fall_detected,
                     timestamp,
+
+                    // Metadata pengujian
+                    test_id: rawData.test_id,
                 };
 
                 await alertRepository.createAlert(alertData);

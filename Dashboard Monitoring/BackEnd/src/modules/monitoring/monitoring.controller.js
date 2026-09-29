@@ -60,6 +60,7 @@ const createMonitoringData = async (req, res) => {
                     temperature,
                     fall_detected,
                     timestamp: new Date(),
+                    test_id: req.body.test_id,
                 };
 
                 await alertRepository.createAlert(alertData);

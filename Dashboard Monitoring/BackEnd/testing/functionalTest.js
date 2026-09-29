@@ -223,10 +223,7 @@ const runScenario = async (name) => {
 // Menjalankan progression satu device secara berulang
 const runProgression = async () => {
 
-    console.log(
-        `Running progression scenario (interval 3s). Ctrl+C to stop.`
-    );
-
+    console.log(`Running progression scenario (interval 3s). Ctrl+C to stop.`);
     console.log(`Backend target: ${BACKEND_URL}\n`);
 
     let i = 0;
@@ -238,9 +235,7 @@ const runProgression = async () => {
             ...randomCoord(),
         };
 
-        console.log(
-            `\n[PROGRESSION] -> ${progressionData.device_id}`
-        );
+        console.log(`\n[PROGRESSION] -> ${progressionData.device_id}`);
 
         console.log(
             `[Condition] HR=${progressionData.heart_rate}, ` +
@@ -291,10 +286,7 @@ else if (arg && SCENARIOS[arg]) {
 } 
 else {
     // Menjalankan seluruh skenario secara berulang
-    console.log(
-        `Running all scenarios in loop (interval 3s). Ctrl+C to stop.`
-    );
-
+    console.log(`Running all scenarios in loop (interval 3s). Ctrl+C to stop.`);
     console.log(`Backend target: ${BACKEND_URL}\n`);
 
     const names = Object.keys(SCENARIOS);

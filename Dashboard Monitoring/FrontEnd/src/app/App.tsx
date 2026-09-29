@@ -61,6 +61,8 @@ export default function App() {
 
     // Mendengarkan data monitoring real-time dari WebSocket backend
     socket.on("monitoring:new", (newData) => {
+      console.log("MONITORING WEBSOCKET:", newData);
+      
       setVolunteers((prevVolunteers) =>
         prevVolunteers.map((vol) => {
           if (vol.device_id === newData.device_id) {
