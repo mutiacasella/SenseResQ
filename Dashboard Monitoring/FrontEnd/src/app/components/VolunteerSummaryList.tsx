@@ -122,7 +122,7 @@ export function VolunteerSummaryList({ volunteers, selectedVolunteerId, onSelect
                     <div className="flex items-center gap-1.5">
                       <Radio className={`w-3.5 h-3.5 ${volunteer.connection_status === 'Connected' ? 'text-green-500' : 'text-red-500'}`} />
                       <span className={`text-sm ${volunteer.connection_status === 'Connected' ? 'text-green-600' : 'text-red-600'}`}>
-                        {volunteer.connection_status === 'connected' ? 'OK' : 'Lost'}
+                        {volunteer.connection_status === 'Connected' ? 'Connected' : 'Lost'}
                       </span>
                     </div>
                   </td>

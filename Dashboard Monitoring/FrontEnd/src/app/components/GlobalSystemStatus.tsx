@@ -2,7 +2,7 @@ import { Activity, Wifi, AlertTriangle } from 'lucide-react';
 
 interface GlobalSystemStatusProps {
   activeVolunteers: number;
-  gatewayStatus: 'connected' | 'error';
+  gatewayStatus: 'connected' | 'disconnected';
   totalAlerts: number;
 }
 
@@ -25,7 +25,7 @@ export function GlobalSystemStatus({ activeVolunteers, gatewayStatus, totalAlert
           <div>
             <p className="text-gray-500 text-xs">Status Gateway LoRa</p>
             <p className={`mt-1 ${gatewayStatus === 'connected' ? 'text-green-600' : 'text-red-600'}`}>
-              {gatewayStatus === 'connected' ? 'Connected' : 'Error'}
+              {gatewayStatus === 'connected' ? 'Connected' : 'Disconnected'}
             </p>
           </div>
           <Wifi className={`w-8 h-8 ${gatewayStatus === 'connected' ? 'text-green-500' : 'text-red-500'}`} />

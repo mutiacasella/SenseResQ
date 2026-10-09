@@ -55,9 +55,25 @@ export default function App() {
         console.error(error);
       });
 
-    const interval = setInterval(() => {
+    // Timer 1: update currentTime tiap 1 detik
+    const clockInterval = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
+
+    // Timer 2: update connection_status tiap 5 detik
+    const connectionInterval = setInterval(() => {
+      setVolunteers((prev) =>
+        prev.map((vol) => {
+          const now = new Date();
+          const lastUpdate = new Date(vol.timestamp);
+          const diffSeconds = (now.getTime() - lastUpdate.getTime()) / 1000;
+          return {
+            ...vol,
+            connection_status: diffSeconds <= 15 ? "Connected" : "Lost",
+          };
+        })
+      );
+    }, 5000);
 
     // Mendengarkan data monitoring real-time dari WebSocket backend
     socket.on("monitoring:new", (newData) => {
@@ -78,6 +94,7 @@ export default function App() {
               fatigue_score: newData.fatigue_score,
               status: newData.severity ?? vol.status,
               timestamp: newData.timestamp,
+              connection_status: "Connected",
             };
           }
           return vol;
@@ -91,7 +108,8 @@ export default function App() {
     });
 
     return () => {
-      clearInterval(interval);
+      clearInterval(clockInterval);
+      clearInterval(connectionInterval);
       socket.off("monitoring:new");
       socket.off("alert:new");
     };
@@ -134,6 +152,8 @@ export default function App() {
     setAlerts(alerts.filter(a => a.alert_id !== alertId));
   };
 
+  const gatewayStatus = activeVolunteers > 0 ? "connected" : "disconnected";
+
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="max-w-[1800px] mx-auto">
@@ -145,7 +165,7 @@ export default function App() {
         <div className="space-y-3">
           <GlobalSystemStatus
             activeVolunteers={activeVolunteers}
-            gatewayStatus="connected"
+            gatewayStatus={gatewayStatus}
             totalAlerts={alerts.length}
           />
 
