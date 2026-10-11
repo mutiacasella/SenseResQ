@@ -95,7 +95,7 @@ const SCENARIOS = {
     // Skenario high risk - 2 nilai vital abnormal
     highrisk: () => ({
         device_id: 'DEV003',
-        heart_rate: 120,
+        heart_rate: 113,
         spo2: 93,
         temperature: 36.8,
         ...randomCoord(),

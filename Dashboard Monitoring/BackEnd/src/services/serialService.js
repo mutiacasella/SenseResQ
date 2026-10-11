@@ -15,8 +15,8 @@ const baudRate = parseInt(process.env.SERIAL_BAUD, 10) || 115200;
 
 // Batas koordinat bounding box area bencana, di-set di file [.env]
 const BBOX = {
-    MIN_LAT: parseFloat(process.env.BBOX_MIN_LAT) || -6.3780,
-    MAX_LAT: parseFloat(process.env.BBOX_MAX_LAT) || -6.3350,
+    MIN_LAT: parseFloat(process.env.BBOX_MIN_LAT) || -6.3850,
+    MAX_LAT: parseFloat(process.env.BBOX_MAX_LAT) || -6.3450,
     MIN_LNG: parseFloat(process.env.BBOX_MIN_LNG) || 106.8150,
     MAX_LNG: parseFloat(process.env.BBOX_MAX_LNG) || 106.8400,
 };
@@ -84,7 +84,7 @@ const processIncomingData = async (rawData) => {
         // Simpan data monitoring yang masuk ke dalam database
         const monitoringId = await monitoringRepository.createMonitoringData(monitoringDataToSave);
 
-        // Kirim data monitoring baru secara real-time melalui WebSocket
+        // Kirim data monitoring baru secara real-time melalui Socket IO
         const io = getIO();
 
         io.emit("monitoring:new", {
@@ -151,7 +151,7 @@ const initSerial = () => {
 
     parser.on('data', async (line) => {
         try {
-            // Ubah string teks mentah dari port serial menjadi format JSON
+            // Ubah string teks mentah dari port serial menjadi javascript object
             const rawData = JSON.parse(line);
             await processIncomingData(rawData);
         }

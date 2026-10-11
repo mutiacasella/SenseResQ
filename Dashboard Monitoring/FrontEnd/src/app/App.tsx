@@ -33,7 +33,7 @@ const socket = io("http://localhost:7777");
 export default function App() {
   const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
-  const [selectedVolunteerId, setSelectedVolunteerId] = useState<string>('RLW-004');
+  const [selectedVolunteerId, setSelectedVolunteerId] = useState<string>('VOL003');
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
