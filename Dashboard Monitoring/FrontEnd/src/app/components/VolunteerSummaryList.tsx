@@ -88,8 +88,8 @@ export function VolunteerSummaryList({ volunteers, selectedVolunteerId, onSelect
                   </td>
                   <td className="px-3 py-2">
                     <div className="flex items-center gap-1.5">
-                      <Heart className={`w-3.5 h-3.5 ${volunteer.heart_rate > 100 ? 'text-red-500' : 'text-red-400'}`} />
-                      <span className={`text-sm ${volunteer.heart_rate > 100 ? 'font-semibold text-red-600' : ''}`}>
+                      <Heart className={`w-3.5 h-3.5 ${volunteer.heart_rate > 175 ? 'text-red-500' : 'text-red-400'}`} />
+                      <span className={`text-sm ${volunteer.heart_rate > 175 ? 'font-semibold text-red-600' : ''}`}>
                         {volunteer.heart_rate} bpm
                       </span>
                     </div>

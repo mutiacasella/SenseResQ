@@ -36,7 +36,7 @@ function AlertMessage({ alert }: { alert: Alert }) {
 
   if (alert.heart_rate < 60)
     vitals.push(`HR ${alert.heart_rate} bpm ↓`);
-  else if (alert.heart_rate > 100)
+  else if (alert.heart_rate > 175)
     vitals.push(`HR ${alert.heart_rate} bpm ↑`);
   else
     vitals.push(`HR ${alert.heart_rate} bpm`);
@@ -105,7 +105,7 @@ export function AlertWarningSystem({ alerts, onDismissAlert }: AlertWarningSyste
                       <AlertMessage alert={alert} />
                       <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-1.5">
                         <Clock className="w-3 h-3" />
-                        <span>{alert.timestamp}</span>
+                        <span>{new Date(alert.timestamp).toLocaleString('id-ID')}</span>
                       </div>
                     </div>
                     {onDismissAlert && (

@@ -12,7 +12,7 @@ const DEVICE_ID = "DEV001";
 const scenarios = [
     {
         name: "Warning",
-        heart_rate: 105,
+        heart_rate: 178,
         spo2: 98,
         temperature: 36.8,
         fall_detected: false,
@@ -21,7 +21,7 @@ const scenarios = [
     },
     {
         name: "High Risk",
-        heart_rate: 55,
+        heart_rate: 192,
         spo2: 93,
         temperature: 36.8,
         fall_detected: false,
@@ -30,7 +30,7 @@ const scenarios = [
     },
     {
         name: "Critical",
-        heart_rate: 120,
+        heart_rate: 189,
         spo2: 92,
         temperature: 38.5,
         fall_detected: false,

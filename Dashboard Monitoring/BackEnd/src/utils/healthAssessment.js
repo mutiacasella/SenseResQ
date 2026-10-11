@@ -3,7 +3,7 @@ const calculateFatigueScore = (heart_rate, temperature, spo2) => {
     let fatigue_score = 0;
 
     // Heart Rate
-    if (heart_rate < 60 || heart_rate > 100) {
+    if (heart_rate < 60 || heart_rate > 175) {
         fatigue_score++;
     }
 

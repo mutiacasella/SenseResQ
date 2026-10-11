@@ -53,8 +53,8 @@ const randomCoord = () => ({
  * Threshold mengacu pada utils/healthAssessment.js:
  *
  * Heart rate:
- *   normal = 60-100
- *   abnormal = <60 atau >100
+ *   normal = 60-175
+ *   abnormal = <60 atau >175
  *
  * Temperature:
  *   normal = 36.4-37.6
@@ -84,7 +84,7 @@ const SCENARIOS = {
     // Skenario warning - 1 nilai vital abnormal
     warning: () => ({
         device_id: 'DEV002',
-        heart_rate: 105,
+        heart_rate: 178,
         spo2: 97,
         temperature: 36.8,
         ...randomCoord(),
@@ -95,7 +95,7 @@ const SCENARIOS = {
     // Skenario high risk - 2 nilai vital abnormal
     highrisk: () => ({
         device_id: 'DEV003',
-        heart_rate: 113,
+        heart_rate: 181,
         spo2: 93,
         temperature: 36.8,
         ...randomCoord(),
@@ -106,7 +106,7 @@ const SCENARIOS = {
     // Skenario critical - 3 nilai vital abnormal
     critical: () => ({
         device_id: 'DEV004',
-        heart_rate: 120,
+        heart_rate: 177,
         spo2: 92,
         temperature: 38.5,
         ...randomCoord(),
@@ -153,7 +153,7 @@ const PROGRESSION = [
     // Kondisi warning
     {
         device_id: 'DEV001',
-        heart_rate: 105,
+        heart_rate: 178,
         spo2: 97,
         temperature: 36.8,
         fall_detected: false,
@@ -163,7 +163,7 @@ const PROGRESSION = [
     // Kondisi high risk
     {
         device_id: 'DEV001',
-        heart_rate: 55,
+        heart_rate: 181,
         spo2: 93,
         temperature: 36.8,
         fall_detected: false,
@@ -173,7 +173,7 @@ const PROGRESSION = [
     // Kondisi critical
     {
         device_id: 'DEV001',
-        heart_rate: 120,
+        heart_rate: 179,
         spo2: 92,
         temperature: 38.5,
         fall_detected: false,
@@ -183,7 +183,7 @@ const PROGRESSION = [
     // Kondisi fall detection - Emergency
     {
         device_id: 'DEV001',
-        heart_rate: 130,
+        heart_rate: 189,
         spo2: 91,
         temperature: 38.2,
         fall_detected: true,

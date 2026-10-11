@@ -11,13 +11,9 @@ export function VitalSignMonitoring({
   volunteerName,
   vitalData,
 }: VitalSignMonitoringProps) {
-  const heartRateNormal =
-    vitalData.heartRate >= 60 && vitalData.heartRate <= 100;
-
+  const heartRateNormal = vitalData.heartRate >= 60 && vitalData.heartRate <= 175;
   const spo2Normal = vitalData.spo2 >= 95;
-
-  const temperatureNormal =
-    vitalData.temperature >= 36.4 && vitalData.temperature <= 37.6;
+  const temperatureNormal = vitalData.temperature >= 36.4 && vitalData.temperature <= 37.6;
 
   return (
     <div className="bg-white rounded-lg shadow">
@@ -139,7 +135,7 @@ export function VitalSignMonitoring({
           <div className="grid grid-cols-3 gap-3 text-center">
             <div>
               <div className="text-gray-600">Normal Range</div>
-              <div className="text-green-700">60-100 bpm</div>
+              <div className="text-green-700">60-175 bpm</div>
             </div>
 
             <div>

@@ -141,7 +141,7 @@ export default function App() {
     heartRate: selectedVolunteer ? selectedVolunteer.heart_rate : 0,
     spo2: selectedVolunteer ? selectedVolunteer.spo2 : 0,
     temperature: selectedVolunteer ? selectedVolunteer.temperature : 0,
-    timestamp: currentTime.toLocaleTimeString("id-ID")
+    timestamp: selectedVolunteer?.timestamp ? new Date(selectedVolunteer.timestamp).toLocaleTimeString('id-ID') : '-'
   };
 
   // Mengurutkan daftar alert berdasarkan waktu terbaru (descending)
@@ -193,7 +193,7 @@ export default function App() {
             <FallDetectionStatus
               volunteerName={selectedVolunteer ? selectedVolunteer.name : ''}
               fallDetected={selectedVolunteer ? Boolean(selectedVolunteer.fall_detected) : false}
-              fallTime={selectedVolunteer?.fall_detected ? '14:23:15' : undefined}
+              fallTime={selectedVolunteer?.fall_detected && selectedVolunteer.timestamp ? new Date(selectedVolunteer.timestamp).toLocaleTimeString('id-ID') : undefined}
             />
 
             <AlertWarningSystem
