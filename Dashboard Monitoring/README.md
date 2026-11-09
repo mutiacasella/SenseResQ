@@ -1,72 +1,101 @@
 # SenseResQ - Dashboard Monitoring Relawan
 
-SenseResQ adalah prototipe dashboard monitoring relawan yang beroperasi secara lokal pada satu laptop Windows. Data wearable diterima melalui receiver USB/Serial, diproses oleh backend Node.js/Express, disimpan di MySQL lokal, dan diperbarui ke frontend React menggunakan Socket.IO.
+SenseResQ adalah prototipe dashboard pemantauan relawan yang beroperasi secara lokal pada laptop Windows. Data dari perangkat *wearable* diterima melalui receiver USB/Serial, diproses oleh backend Node.js/Express, disimpan dalam database MySQL lokal, dan ditampilkan secara real-time pada frontend React menggunakan Socket.IO.
 
-**Dokumen pengguna:**
-- `PANDUAN_SENSERESQ.pdf` - instalasi dan langkah penggunaan dari awal.
-- `DESAIN_DASHBOARD_SENSERESQ.pdf` - fungsi, arsitektur, pengelolaan relawan/perangkat, dan batas sistem.
+**Dokumentasi:**
+- `PANDUAN_SENSERESQ.pdf` — panduan instalasi, konfigurasi, dan penggunaan aplikasi.
+- `DESAIN_DASHBOARD_SENSERESQ.pdf` — penjelasan fitur, arsitektur, pengelolaan relawan dan perangkat, serta batasan sistem.
 
-## Penggunaan pada laptop Windows
+## Instalasi dan Penggunaan pada Windows
 
-1. Install Node.js LTS dan MySQL Community Server 8.4 LTS dengan MySQL Configurator. Konfigurasikan Windows Service MySQL agar berjalan otomatis. Gunakan port `3306`.
-2. Buat `BackEnd/.env` dari `BackEnd/.env.example`. Masukkan password MySQL pada `DB_PASSWORD`, pastikan `DB_NAME=senseresq`, dan atur `SERIAL_PORT` serta BBOX sesuai perangkat/lokasi.
-3. **Cadangkan database** jika sudah mempunyai data penting. Klik dua kali `PERSIAPAN_SEKALI_WINDOWS.bat` saat internet tersedia. Script memasang dependensi, menyiapkan/memigrasikan lima tabel MySQL tanpa `DROP DATABASE`, lalu membangun frontend.
-4. Setelah proses bertuliskan `SELESAI`, klik dua kali `START_SENSERESQ_WINDOWS.bat`. Dashboard tersedia pada `http://127.0.0.1:7777`; biarkan jendela server terbuka.
-5. Setelah instalasi awal, dashboard dapat beroperasi tanpa internet. Backend dan frontend tidak memerlukan dua terminal yang dijalankan secara manual.
+1. Instal Node.js LTS dan MySQL Community Server 8.4 LTS menggunakan MySQL Configurator. Atur MySQL sebagai Windows Service yang berjalan otomatis dengan port `3306`.
+2. Salin `BackEnd/.env.example` menjadi `BackEnd/.env`. Sesuaikan `DB_PASSWORD` dengan konfigurasi MySQL, pastikan `DB_NAME=senseresq`, serta atur `SERIAL_PORT` dan BBOX sesuai perangkat dan lokasi pemantauan.
+3. Jika database sebelumnya telah digunakan, lakukan pencadangan data terlebih dahulu. Jalankan `PERSIAPAN_SEKALI_WINDOWS.bat` dengan koneksi internet aktif. Proses ini memasang dependensi, menyiapkan atau memigrasikan lima tabel MySQL tanpa menghapus database, dan membangun frontend.
+4. Setelah proses persiapan selesai, jalankan `START_SENSERESQ_WINDOWS.bat`. Dashboard dapat diakses melalui [http://127.0.0.1:7777](http://127.0.0.1:7777). Biarkan jendela server tetap terbuka selama aplikasi digunakan.
+5. Setelah instalasi awal, dashboard dapat dijalankan secara lokal tanpa koneksi internet. Backend dan frontend dijalankan melalui satu skrip sehingga tidak memerlukan dua terminal terpisah.
 
-**Konfigurasi rahasia:** berkas `.env` berisi kata sandi dan tidak disertakan di dalam ZIP distribusi. Salin konfigurasi `.env` yang sudah digunakan pada laptop sebelumnya secara pribadi, atau buat dari `.env.example`. Jangan unggah kata sandi ke repositori publik.
+**Konfigurasi:** File `.env` menyimpan pengaturan lokal, termasuk kata sandi database, dan tidak disertakan dalam distribusi proyek. Konfigurasi dapat dibuat menggunakan `.env.example` atau disalin dari instalasi sebelumnya. Informasi sensitif dalam file `.env` tidak boleh disertakan dalam repository publik.
 
-## Pengelolaan relawan dan perangkat
+## Pengelolaan Relawan dan Perangkat
 
-- **+ Daftarkan Relawan > Relawan baru**: masukkan ID, nama, dan ID perangkat. Perangkat baru didaftarkan otomatis.
-- **Edit (ikon pensil)**: perbaiki nama, atau pilih ID perangkat lain. Jika perangkat berubah, sistem mengakhiri penugasan perangkat sebelumnya dan membuat penugasan baru.
-- **Akhiri Penugasan (ikon tempat sampah)**: relawan keluar dari daftar pemantauan aktif; identitas dan riwayat tidak dihapus.
-- **+ Daftarkan Relawan > Tugaskan kembali**: pilih relawan yang tidak sedang bertugas, masukkan ID perangkat yang tersedia, lalu mulai penugasan.
-- Satu relawan dan satu perangkat hanya dapat memiliki satu penugasan aktif pada waktu yang sama.
+SenseResQ menyediakan fitur pengelolaan relawan dan penugasan perangkat sebagai berikut:
 
-## Data dan arsitektur
+- **Daftarkan Relawan → Relawan baru:** mendaftarkan relawan dengan memasukkan ID, nama, dan ID perangkat. Perangkat yang belum terdaftar akan ditambahkan secara otomatis.
+- **Edit (ikon pensil):** memperbarui nama relawan atau mengganti perangkat yang digunakan. Pergantian perangkat akan mengakhiri penugasan sebelumnya dan membuat penugasan baru.
+- **Akhiri Penugasan (ikon tempat sampah):** mengakhiri penugasan aktif sehingga relawan tidak lagi ditampilkan dalam daftar pemantauan aktif. Identitas dan riwayat pemantauan tetap tersimpan.
+- **Daftarkan Relawan → Tugaskan kembali:** mengaktifkan kembali relawan yang telah mengakhiri penugasan dengan memilih perangkat yang tersedia.
 
-MySQL berisi lima tabel: `Device`, `Volunteer`, `DeviceAssignment`, `MonitoringData`, dan `Alert`. Identitas relawan dan perangkat tersimpan permanen. Setiap sesi pemakaian dicatat sebagai `assignment_id` pada tabel `DeviceAssignment` dengan waktu mulai/selesai. Data monitoring dan alert dikaitkan dengan penugasan agar riwayat tidak berpindah antarrelawan.
+Setiap relawan dan perangkat hanya dapat memiliki satu penugasan aktif pada waktu yang sama. Riwayat penugasan sebelumnya tetap tersimpan ketika perangkat diganti atau digunakan kembali.
 
-Ketika setup pada database yang sudah berisi data dijalankan, `BackEnd/tools/setupDatabase.js` akan membentuk penugasan historis untuk entri lama yang belum memiliki penugasan, mengaitkan rekaman monitoring/alert lamanya, dan menghapus batasan unik perangkat pada tabel Volunteer. Penugasan baru tidak menghapus catatan lama. **Selalu buat backup sebelum migrasi**, terutama bila basis data pernah diubah secara manual.
+## Data dan Arsitektur
 
-Paket yang masuk akan diproses hanya jika ID perangkat sudah terdaftar dan memiliki penugasan aktif. Dalam dashboard, data sensor dari penugasan aktif saja yang menjadi dasar nilai vital dan status koneksi.
+SenseResQ menggunakan lima tabel utama dalam MySQL:
 
-## Status koneksi dan monitoring
+- `Device` — menyimpan identitas perangkat.
+- `Volunteer` — menyimpan identitas relawan.
+- `DeviceAssignment` — mencatat hubungan penugasan relawan dan perangkat, termasuk waktu mulai dan berakhirnya penugasan.
+- `MonitoringData` — menyimpan hasil pemantauan sensor.
+- `Alert` — menyimpan informasi peringatan yang dihasilkan sistem.
 
-- **Connected (relawan)**: paket diterima kurang dari 5 detik yang lalu.
-- **Lost (relawan)**: tidak ada paket baru selama 5 detik atau lebih.
-- **Menunggu data**: belum pernah menerima data dalam penugasan aktif.
-- **Receiver USB/Serial Connected**: port receiver terbuka di backend, bukan jaminan tiap wearable menerima koneksi LoRa.
-- **Socket.IO terputus**: komunikasi real-time browser dengan backend terganggu.
+Setiap penugasan memiliki `assignment_id` yang digunakan untuk menghubungkan data pemantauan dan peringatan dengan penugasan terkait. Dengan mekanisme ini, riwayat pemantauan tetap dapat dibedakan meskipun perangkat digunakan oleh relawan yang berbeda.
 
-Status risiko dari tiga tanda vital dan fall detection dihitung dalam `BackEnd/src/utils/healthAssessment.js`. Klasifikasi risiko merupakan aturan prototipe, bukan penilaian klinis tervalidasi.
+Untuk instalasi dengan database yang sudah memiliki data, `BackEnd/tools/setupDatabase.js` menyediakan mekanisme migrasi. Proses ini membentuk catatan penugasan untuk data lama yang belum memiliki penugasan, menghubungkan riwayat pemantauan dan peringatan, serta menyesuaikan batasan perangkat pada tabel `Volunteer`.
 
-## Mode simulasi
+Pencadangan database disarankan sebelum menjalankan migrasi, khususnya jika struktur atau isi database pernah dimodifikasi.
 
-1. Tutup server, ubah `MOCK_MODE=true` di `BackEnd/.env`, lalu jalankan ulang `START_SENSERESQ_WINDOWS.bat`.
-2. Pastikan perangkat yang ingin digunakan mempunyai penugasan aktif.
-3. Klik dua kali `DEMO_SENSERESQ_WINDOWS.bat`, masukkan ID perangkat yang terdaftar. Simulator mengirim paket HTTP sekitar setiap 1 detik; kondisi sensor berganti sekitar setiap 5 detik.
-4. Untuk kembali ke receiver fisik, hentikan simulator, ubah `MOCK_MODE=false`, lalu jalankan ulang server.
+Data dari receiver diproses apabila ID perangkat terdaftar dan memiliki penugasan aktif. Informasi tanda vital dan status koneksi pada dashboard menggunakan data dari penugasan yang sedang berlangsung.
 
-Semua data pada mode simulasi merupakan data buatan. Jangan mengklaimnya sebagai pengukuran wearable asli.
+## Status Koneksi dan Monitoring
 
-## Pengembangan dan pengujian oleh tim
+Dashboard menampilkan beberapa indikator koneksi:
 
-- Backend mode pengembang: pada folder `BackEnd`, jalankan `npm run dev` atau `npm start`.
-- Frontend mode pengembang: pada folder `FrontEnd`, jalankan `npm run dev`. Pada mode distribusi gunakan hasil build frontend dari `PERSIAPAN_SEKALI_WINDOWS.bat`.
-- Pengujian logika penugasan (tanpa MySQL): pada folder `BackEnd`, jalankan `node testing/assignmentLogicTest.js`.
-- Folder `BackEnd/testing` berisi script lain untuk pengujian; beberapa script lama perlu disesuaikan dengan skema penugasan. Jangan menjalankan pengujian yang menulis atau menghapus data pada database produksi tanpa cadangan.
-- `BackEnd/src/ERD SenseResQ.jpg` merupakan aset diagram yang ada di folder kode. Untuk rincian struktur database yang digunakan aplikasi, rujuk `DESAIN_DASHBOARD_SENSERESQ.pdf`.
+- **Connected:** relawan menerima pembaruan data dalam waktu kurang dari 5 detik.
+- **Lost:** tidak terdapat pembaruan data selama 5 detik atau lebih.
+- **Menunggu data:** belum terdapat data sensor yang diterima untuk penugasan aktif.
+- **Receiver USB/Serial Connected:** port receiver berhasil dibuka oleh backend. Status ini tidak secara langsung menunjukkan konektivitas masing-masing perangkat wearable melalui LoRa.
+- **Socket.IO terputus:** komunikasi real-time antara browser dan backend sedang terganggu.
 
-## Pemecahan masalah
+Penilaian status risiko berdasarkan tanda vital dan deteksi jatuh dilakukan melalui `BackEnd/src/utils/healthAssessment.js`. Klasifikasi tersebut menggunakan aturan yang dirancang untuk kebutuhan prototipe dan belum merupakan penilaian klinis yang tervalidasi.
 
-- `Node.js/npm tidak ditemukan`: instal Node.js LTS dan ulangi persiapan.
-- `Access denied for user root`: periksa `DB_PASSWORD` di `.env`.
-- `ECONNREFUSED ...:3306`: jalankan layanan MySQL pada `services.msc`.
-- `EADDRINUSE :7777`: tutup jendela backend SenseResQ yang masih berjalan.
-- `no_active_assignment`: pilih atau buat penugasan aktif untuk ID perangkat pengirim.
-- `Lost`: periksa selang penerimaan paket dan interval pengiriman wearable.
-- Serial `Disconnected`: periksa kabel, COM, baud rate; sambungkan ulang dan restart backend jika perlu.
+## Mode Simulasi
 
-**Batas keamanan:** aplikasi ini tidak menyediakan autentikasi pengguna dan hanya melayani `127.0.0.1` pada laptop yang sama. Dashboard adalah prototipe pemantauan, bukan alat medis atau sistem keselamatan kritis yang telah tervalidasi.
+SenseResQ menyediakan mode simulasi untuk menguji alur penerimaan dan penampilan data tanpa memerlukan perangkat wearable fisik.
+
+1. Hentikan server, kemudian ubah `MOCK_MODE=true` pada `BackEnd/.env`.
+2. Jalankan kembali `START_SENSERESQ_WINDOWS.bat`.
+3. Pastikan ID perangkat yang akan digunakan memiliki penugasan aktif.
+4. Jalankan `DEMO_SENSERESQ_WINDOWS.bat`, lalu masukkan ID perangkat yang telah terdaftar.
+5. Simulator akan mengirimkan data melalui HTTP sekitar setiap 1 detik dengan perubahan kondisi sensor sekitar setiap 5 detik.
+
+Untuk kembali menggunakan receiver fisik, hentikan simulator, ubah `MOCK_MODE=false`, kemudian jalankan ulang server.
+
+**Catatan:** Data dalam mode simulasi merupakan data sintetis yang digunakan untuk mendemonstrasikan dan menguji perilaku dashboard, bukan hasil pengukuran perangkat wearable.
+
+## Pengembangan dan Pengujian
+
+Proyek juga mendukung pengembangan dan pengujian komponen secara terpisah.
+
+- **Backend:** jalankan `npm run dev` atau `npm start` dari folder `BackEnd`.
+- **Frontend:** jalankan `npm run dev` dari folder `FrontEnd`. Pada penggunaan normal, aplikasi menggunakan hasil build frontend yang dibuat melalui `PERSIAPAN_SEKALI_WINDOWS.bat`.
+- **Pengujian logika penugasan:** jalankan `node testing/assignmentLogicTest.js` dari folder `BackEnd`. Pengujian ini tidak memerlukan koneksi MySQL.
+- **Pengujian tambahan:** tersedia dalam folder `BackEnd/testing`. Beberapa skrip pengujian lama menggunakan struktur database sebelumnya sehingga mungkin memerlukan penyesuaian. Pengujian yang mengubah data sebaiknya dilakukan menggunakan database khusus pengujian.
+
+File `BackEnd/src/ERD SenseResQ.jpg` merupakan aset diagram database dalam proyek. Penjelasan arsitektur dan struktur data terbaru tersedia dalam `DESAIN_DASHBOARD_SENSERESQ.pdf`.
+
+## Pemecahan Masalah
+
+| Permasalahan | Penanganan |
+|---|---|
+| `Node.js/npm tidak ditemukan` | Pastikan Node.js LTS telah terinstal, kemudian jalankan kembali proses persiapan. |
+| `Access denied for user root` | Periksa `DB_PASSWORD` pada file `.env`. |
+| `ECONNREFUSED ...:3306` | Periksa layanan MySQL melalui `services.msc` dan pastikan layanan berjalan. |
+| `EADDRINUSE :7777` | Pastikan tidak ada proses backend SenseResQ lain yang masih menggunakan port `7777`. |
+| `no_active_assignment` | Pastikan ID perangkat pengirim memiliki penugasan aktif. |
+| Status `Lost` | Periksa koneksi perangkat, penerimaan paket, dan interval pengiriman data. |
+| Serial `Disconnected` | Periksa koneksi USB, nomor port COM, dan baud rate. Sambungkan kembali receiver dan jalankan ulang backend jika diperlukan. |
+
+## Batasan Sistem
+
+SenseResQ dikembangkan sebagai prototipe dashboard pemantauan relawan dan dijalankan secara lokal melalui `127.0.0.1`. Sistem belum menyediakan autentikasi pengguna maupun akses pemantauan melalui jaringan eksternal.
+
+Status risiko dan peringatan yang ditampilkan merupakan hasil pemrosesan berdasarkan aturan prototipe. Sistem belum divalidasi sebagai perangkat medis atau sistem keselamatan kritis.
