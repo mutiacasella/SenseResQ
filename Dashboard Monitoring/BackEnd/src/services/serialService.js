@@ -8,6 +8,7 @@ const volunteerRepository = require('../modules/volunteer/volunteer.repository')
 
 const { calculateFatigueScore, getSeverity, getAlertType } = require('../utils/healthAssessment');
 const { getIO } = require('../utils/socket');
+const { setSerialStatus } = require('../utils/serialStatus');
 
 // Konfigurasi serial, di-set di file [.env]
 const portPath = process.env.SERIAL_PORT || 'COM3';
@@ -58,7 +59,15 @@ const processIncomingData = async (rawData) => {
         const deviceExists = await monitoringRepository.deviceExists(device_id);
         if (!deviceExists) {
             console.warn(`[Serial] Unknown device_id "${device_id}", skipping.`);
-            return;
+            return { accepted: false, reason: 'unknown_device' };
+        }
+
+        // Paket hanya disimpan ketika perangkat sedang memiliki penugasan aktif.
+        // Ini mencegah data lama masuk ke identitas relawan berikutnya.
+        const assignedVolunteer = await volunteerRepository.getVolunteerByDeviceId(device_id);
+        if (!assignedVolunteer) {
+            console.warn(`[Serial] Device ${device_id} tidak memiliki penugasan aktif; paket dilewati.`);
+            return { accepted: false, reason: 'no_active_assignment' };
         }
 
         // Konversi latitude dan longitude menjadi koordinat relatif x dan y
@@ -66,6 +75,7 @@ const processIncomingData = async (rawData) => {
 
         const monitoringDataToSave = {
             device_id,
+            assignment_id: assignedVolunteer.assignment_id,
             heart_rate,
             spo2,
             temperature,
@@ -98,14 +108,15 @@ const processIncomingData = async (rawData) => {
         });
 
         // Cek relawan terkait dan buat peringatan jika threshold terlewati
-        const volunteer = await volunteerRepository.getVolunteerByDeviceId(device_id);
+        const volunteer = assignedVolunteer;
         if (volunteer && type !== null) {
-            const latestAlert = await alertRepository.getLatestAlertByVolunteer(volunteer.volunteer_id);
+            const latestAlert = await alertRepository.getLatestAlertByVolunteer(volunteer.volunteer_id, volunteer.assignment_id);
             const shouldCreateAlert = !latestAlert || latestAlert.type !== type || latestAlert.severity !== severity;
 
             if (shouldCreateAlert) {
                 const alertData = {
                     volunteer_id: volunteer.volunteer_id,
+                    assignment_id: volunteer.assignment_id,
                     volunteer_name: volunteer.name,
                     type,
                     severity,
@@ -120,32 +131,51 @@ const processIncomingData = async (rawData) => {
                     test_id: rawData.test_id,
                 };
 
-                await alertRepository.createAlert(alertData);
-                io.emit("alert:new", alertData);
+                const alertId = await alertRepository.createAlert(alertData);
+                io.emit("alert:new", { alert_id: alertId, ...alertData });
             }
         }
+        return { accepted: true };
     }
     catch (error) {
-        if (error instanceof SyntaxError) {
-            console.error("[Serial] JSON parse error. Raw line:", rawData);
-        } 
-        else {
-            console.error("[Serial] Failed to process data:", error.message);
-        }
+        console.error('[Serial] Failed to process data:', error.message);
+        throw error;
     }
 };
 
 const initSerial = () => {
     // Mode mock: skip koneksi serial fisik, dipakai untuk testing via simulator
     if (process.env.MOCK_MODE === 'true') {
+        setSerialStatus('mock');
         console.log('[Serial] MOCK_MODE aktif, koneksi serial fisik diabaikan');
         return;
     }
 
-    const port = new SerialPort({ path: portPath, baudRate: baudRate });
+    const port = new SerialPort({
+        path: portPath,
+        baudRate: baudRate,
+        autoOpen: false,
+        rtscts: false
+    });
+
+    port.open((err) => {
+        if (err) {
+            setSerialStatus('disconnected');
+            console.error('[Serial] Failed to open port:', err.message);
+            return;
+        }
+
+        port.set({ dtr: false, rts: false }, (err) => {
+            if (err) {
+                console.error('[Serial] Failed to configure control signals:', err.message);
+            }
+        });
+    });
+
     const parser = port.pipe(new ReadlineParser({ delimiter: '\r\n' }));
 
     port.on('open', () => {
+        setSerialStatus('connected');
         console.log(`Serial Port ${portPath} connected successfully.`);
     });
 
@@ -156,11 +186,14 @@ const initSerial = () => {
             await processIncomingData(rawData);
         }
         catch (error) {
-            console.error("[Serial] JSON parse error. Raw line:", line);
+            console.error('[Serial] Failed to process line:', error.message);
         }
     });
 
+    port.on('close', () => setSerialStatus('disconnected'));
+
     port.on('error', (err) => {
+        setSerialStatus('disconnected');
         console.error("Serial port error: ", err.message);
     });
 };

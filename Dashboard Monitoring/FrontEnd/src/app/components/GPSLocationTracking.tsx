@@ -21,6 +21,7 @@ const STATUS_DOT: Record<VolunteerStatus, string> = {
   "High Risk": 'bg-orange-500',
   Warning: 'bg-yellow-500',
   Normal: 'bg-green-500',
+  'No Data': 'bg-gray-400',
 };
 
 // Konfigurasi warna animasi ring radar berdasarkan status
@@ -30,6 +31,7 @@ const STATUS_RING: Record<VolunteerStatus, string> = {
   "High Risk": 'bg-orange-500',
   Warning: 'bg-yellow-400',
   Normal: 'bg-green-500',
+  'No Data': 'bg-gray-400',
 };
 
 // Pemetaan teks label status untuk tampilan tooltip
@@ -39,6 +41,7 @@ const STATUS_LABEL: Record<VolunteerStatus, string> = {
   "High Risk": 'HIGH RISK',
   Warning: 'WARNING',
   Normal: 'Normal',
+  'No Data': 'Belum ada data',
 };
 
 // Komponen untuk melacak dan memvisualisasikan posisi GPS relawan pada peta grid real-time
@@ -50,7 +53,7 @@ export function GPSLocationTracking({ volunteers, gpsData, selectedVolunteerId, 
         <h2 className="text-lg">GPS Location Tracking</h2>
       </div>
       <div className="p-3">
-        <div className="relative bg-gray-50 border-2 border-gray-300 rounded-lg" style={{ height: '400px' }}>
+        <div className="relative w-full aspect-square bg-gray-50 border-2 border-gray-300 rounded-lg">
           <div className="absolute inset-0 grid grid-cols-10 grid-rows-10">
             {Array.from({ length: 100 }).map((_, i) => (
               <div key={i} className="border border-gray-200" />
@@ -63,8 +66,8 @@ export function GPSLocationTracking({ volunteers, gpsData, selectedVolunteerId, 
               if (!gps) return null;
 
               const isSelected = volunteer.volunteer_id === selectedVolunteerId;
-              const dotColor = STATUS_DOT[volunteer.status] || 'bg-gray-400';
-              const ringColor = STATUS_RING[volunteer.status] || 'bg-gray-400';
+              const dotColor = volunteer.connection_status === 'Lost' ? 'bg-gray-400' : (STATUS_DOT[volunteer.status] || 'bg-gray-400');
+              const ringColor = volunteer.connection_status === 'Lost' ? 'bg-gray-400' : (STATUS_RING[volunteer.status] || 'bg-gray-400');
 
               return (
                 <div
@@ -98,7 +101,7 @@ export function GPSLocationTracking({ volunteers, gpsData, selectedVolunteerId, 
                         <div className="text-blue-200">{STATUS_LABEL[volunteer.status]}</div>
                         <div className="flex items-center gap-1 text-blue-300">
                           <Clock className="w-3 h-3" />
-                          {gps.lastUpdate}
+                          {gps.lastUpdate} {volunteer.connection_status === 'Lost' ? '(data lama)' : ''}
                         </div>
                         <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-blue-700" />
                       </div>
@@ -111,7 +114,7 @@ export function GPSLocationTracking({ volunteers, gpsData, selectedVolunteerId, 
                         <div className="text-gray-300">{STATUS_LABEL[volunteer.status]}</div>
                         <div className="flex items-center gap-1 text-gray-300">
                           <Clock className="w-3 h-3" />
-                          {gps.lastUpdate}
+                          {gps.lastUpdate} {volunteer.connection_status === 'Lost' ? '(data lama)' : ''}
                         </div>
                       </div>
                     )}
@@ -120,6 +123,12 @@ export function GPSLocationTracking({ volunteers, gpsData, selectedVolunteerId, 
               );
             })}
           </div>
+
+          {Object.keys(gpsData).length === 0 && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="bg-white/90 rounded-lg border px-5 py-3 text-sm text-gray-600 text-center">Belum ada koordinat GPS yang diterima</div>
+            </div>
+          )}
 
           {/* Legend */}
           <div className="absolute top-2 left-2 bg-white/90 rounded p-2 text-xs space-y-1">

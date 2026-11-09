@@ -5,6 +5,8 @@ const volunteerController = require('./volunteer.controller');
 // Untuk kepentingan pengembangan
 router.post("/volunteer", volunteerController.createVolunteer);
 router.get("/volunteer", volunteerController.getAllVolunteers);
+router.get("/volunteer/inactive", volunteerController.getInactiveVolunteers);
+router.post("/volunteer/:id/activate", volunteerController.activateVolunteer);
 router.get("/volunteer/:id", volunteerController.getVolunteerById);
 router.put("/volunteer/:id", volunteerController.updateVolunteer);
 router.delete("/volunteer/:id", volunteerController.deleteVolunteer);

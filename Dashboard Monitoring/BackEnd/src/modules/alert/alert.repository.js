@@ -4,6 +4,7 @@ const pool = require("../../config/database");
 const createAlert = async (alertData) => {
     const {
         volunteer_id,
+        assignment_id,
         type,
         severity,
         fatigue_score,
@@ -19,6 +20,7 @@ const createAlert = async (alertData) => {
         INSERT INTO Alert
         (
             volunteer_id,
+            assignment_id,
             type,
             severity,
             fatigue_score,
@@ -28,10 +30,11 @@ const createAlert = async (alertData) => {
             fall_detected,
             timestamp
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `,
         [
             volunteer_id,
+            assignment_id,
             type,
             severity,
             fatigue_score,
@@ -52,6 +55,7 @@ const getAllAlerts = async () => {
         SELECT
             a.alert_id,
             a.volunteer_id,
+            a.assignment_id,
             v.name AS volunteer_name,
             a.type,
             a.severity,
@@ -81,10 +85,10 @@ const getAlertById = async (alertId) => {
 };
 
 // Mengambil data peringatan terakhir berdasarkan id relawan
-const getLatestAlertByVolunteer = async (volunteerId) => {
+const getLatestAlertByVolunteer = async (volunteerId, assignmentId) => {
     const [rows] = await pool.query(
-        "SELECT * FROM Alert WHERE volunteer_id = ? ORDER BY timestamp DESC LIMIT 1",
-        [volunteerId]
+        "SELECT * FROM Alert WHERE volunteer_id = ? AND assignment_id = ? ORDER BY timestamp DESC, alert_id DESC LIMIT 1",
+        [volunteerId, assignmentId]
     );
 
     return rows[0];

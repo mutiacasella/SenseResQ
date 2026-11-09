@@ -6,7 +6,7 @@ const API_URL = "http://localhost:7777";
 const DEVICES = ["DEV001", "DEV002", "DEV003", "DEV004", "DEV005"];
 
 // Konfigurasi Stress Test
-// Beban dinaikkan secara bertahap untuk mengetahui batas kemampuan sistem.
+// Beban dinaikkan secara bertahap untuk mengetahui batas kemampuan sistem
 const SCENARIOS = [
     {
         name: "Baseline",
@@ -40,12 +40,12 @@ const SCENARIOS = [
     },
 ];
 
-// Menunggu selama jumlah milidetik tertentu.
+// Menunggu selama jumlah milidetik tertentu
 const sleep = (ms) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
-// Menghitung percentile dari kumpulan nilai latency.
+// Menghitung percentile dari kumpulan nilai latency
 const calculatePercentile = (values, percentile) => {
     if (values.length === 0) {
         return 0;
@@ -58,7 +58,7 @@ const calculatePercentile = (values, percentile) => {
     return sorted[Math.max(0, index)];
 };
 
-// Membuat data sensor untuk setiap device.
+// Membuat data sensor untuk setiap device
 const createTestData = (deviceId, sequence) => {
     return {
         device_id: deviceId,
@@ -73,7 +73,7 @@ const createTestData = (deviceId, sequence) => {
         fall_detected: false,
         activity_status: "Active",
 
-        // ID ini digunakan untuk membedakan data stress test.
+        // ID ini digunakan untuk membedakan data stress test
         test_id: `STRESS-${Date.now()}-${deviceId}-${sequence}`,
     };
 };
@@ -103,7 +103,7 @@ const runScenario = async (scenario, socket) => {
     let websocketReceived = 0;
     let websocketDisconnects = 0;
 
-    // Mencatat status koneksi WebSocket selama skenario berjalan.
+    // Mencatat status koneksi WebSocket selama skenario berjalan
     const disconnectHandler = () => {
         websocketDisconnects++;
     };
@@ -112,7 +112,7 @@ const runScenario = async (scenario, socket) => {
 
     const startTime = Date.now();
 
-    // Mengirim request secara bertahap berdasarkan target throughput.
+    // Mengirim request secara bertahap berdasarkan target throughput
     while (Date.now() - startTime < scenario.duration * 1000) {
         const deviceId = DEVICES[sent % scenario.devices];
         const data = createTestData(deviceId, sent);
@@ -139,7 +139,7 @@ const runScenario = async (scenario, socket) => {
         await sleep(intervalMs);
     }
 
-    // Memberikan waktu kepada request terakhir untuk selesai.
+    // Memberikan waktu kepada request terakhir untuk selesai
     await sleep(2000);
 
     const actualDuration =
@@ -189,7 +189,7 @@ const main = async () => {
     console.log("Device :", DEVICES.join(", "));
     console.log("");
 
-    // Membuka koneksi WebSocket untuk memantau kestabilan koneksi.
+    // Membuka koneksi WebSocket untuk memantau kestabilan koneksi
     const socket = io(API_URL);
 
     await new Promise((resolve) => {
@@ -205,15 +205,14 @@ const main = async () => {
         });
     });
 
-    // Menghitung jumlah event monitoring yang diterima melalui WebSocket.
+    // Menghitung jumlah event monitoring yang diterima melalui WebSocket
     socket.on("monitoring:new", () => {
-        // Event diterima sebagai indikator bahwa backend
-        // masih mengirimkan hasil pemrosesan secara real-time.
+        // Event diterima sebagai indikator bahwa backend masih mengirimkan hasil pemrosesan secara real-time
     });
 
     const results = [];
 
-    // Menjalankan seluruh skenario secara berurutan.
+    // Menjalankan seluruh skenario secara berurutan
     for (const scenario of SCENARIOS) {
         try {
             const result = await runScenario(
@@ -223,8 +222,7 @@ const main = async () => {
 
             results.push(result);
 
-            // Jeda antar-skenario agar sistem memiliki waktu
-            // menyelesaikan proses yang masih tertunda.
+            // Jeda antar-skenario agar sistem memiliki waktu menyelesaikan proses yang masih tertunda
             await sleep(3000);
         } 
         catch (error) {
@@ -283,7 +281,7 @@ const main = async () => {
         0
     );
 
-    // Menjumlahkan seluruh WebSocket disconnect selama pengujian.
+    // Menjumlahkan seluruh WebSocket disconnect selama pengujian
     const totalWsDisconnect = results.reduce(
         (total, result) => total + result.websocketDisconnects,
         0

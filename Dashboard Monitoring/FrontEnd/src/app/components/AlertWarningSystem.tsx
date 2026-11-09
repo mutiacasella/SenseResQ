@@ -8,7 +8,7 @@ interface AlertWarningSystemProps {
 }
 
 // Konfigurasi tampilan berdasarkan tingkat keparahan alert
-const SEVERITY_STYLE: Record<VolunteerStatus, { card: string; badge: string; badgeText: string; label: string; icon: string }> = {
+const SEVERITY_STYLE: Record<Exclude<VolunteerStatus, 'No Data'>, { card: string; badge: string; badgeText: string; label: string; icon: string }> = {
   Emergency : { card: 'bg-red-50 border-red-500', badge: 'bg-red-600 text-white', badgeText: '', label: 'EMERGENCY', icon: 'text-red-600' },
   Critical : { card: 'bg-red-50 border-red-300', badge: 'bg-red-500 text-white', badgeText: '', label: 'CRITICAL',  icon: 'text-red-500' },
   "High Risk": { card: 'bg-orange-50 border-orange-300', badge: 'bg-orange-500 text-white', badgeText: '', label: 'HIGH RISK', icon: 'text-orange-500' },
@@ -73,17 +73,17 @@ export function AlertWarningSystem({ alerts, onDismissAlert }: AlertWarningSyste
       <div className="p-3 border-b flex items-center justify-between">
         <div className="flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 text-orange-500" />
-          <h2 className="text-lg">Alert / Warning System</h2>
+          <h2 className="text-lg">Riwayat Alert / Warning</h2>
         </div>
         <div className="text-xs text-gray-600">
-          {alerts.length} Alert{alerts.length !== 1 ? 's' : ''} Aktif
+          {alerts.length} catatan
         </div>
       </div>
       <div className="p-3">
         {alerts.length === 0 ? (
           <div className="text-center py-6 text-gray-500">
             <AlertCircle className="w-10 h-10 mx-auto mb-2 text-gray-400" />
-            <p className="text-sm">Tidak ada alert aktif</p>
+            <p className="text-sm">Belum ada riwayat alert</p>
           </div>
         ) : (
           <div className="space-y-2 max-h-[280px] overflow-auto">

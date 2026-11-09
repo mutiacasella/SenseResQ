@@ -1,6 +1,7 @@
 export interface VitalSignData {
-    heartRate: number;
-    spo2: number;
-    temperature: number;
-    timestamp: string;
+  heartRate: number | null;
+  spo2: number | null;
+  temperature: number | null;
+  timestamp: string;
+  connectionStatus: 'Connected' | 'Lost' | 'Awaiting Data';
 }

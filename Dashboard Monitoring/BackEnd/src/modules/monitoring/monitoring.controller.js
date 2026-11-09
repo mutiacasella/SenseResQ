@@ -15,13 +15,18 @@ const createMonitoringData = async (req, res) => {
             fall_detected,
         } = req.body;
 
+        const volunteer = await volunteerRepository.getVolunteerByDeviceId(device_id);
+        if (!volunteer) {
+            return res.status(409).json({ success: false, message: 'Perangkat belum memiliki penugasan aktif.' });
+        }
+
         // Menghitung informasi peringatan
         const fatigue_score = calculateFatigueScore(heart_rate, temperature, spo2);
         const severity = getSeverity(fatigue_score, fall_detected);
         const type = getAlertType(fall_detected, fatigue_score);
 
         // Menyimpan data monitoring ke database
-        const monitoringId = await monitoringRepository.createMonitoringData(req.body);
+        const monitoringId = await monitoringRepository.createMonitoringData({ ...req.body, assignment_id: volunteer.assignment_id });
 
         const io = getIO();
 
@@ -29,21 +34,13 @@ const createMonitoringData = async (req, res) => {
         io.emit("monitoring:new", {
             monitoring_id: monitoringId,
             ...req.body,
+            assignment_id: volunteer.assignment_id,
             fatigue_score,
             severity,
         });
 
-        // Mengambil data relawan berdasarkan id perangkat
-        const volunteer = await volunteerRepository.getVolunteerByDeviceId(device_id);
-        if (!volunteer) {
-            return res.status(404).json({
-                success: false,
-                message: "Volunteer not found",
-            });
-        }
-
         // Mengambil data peringatan terakhir dari relawan
-        const latestAlert = await alertRepository.getLatestAlertByVolunteer(volunteer.volunteer_id);
+        const latestAlert = await alertRepository.getLatestAlertByVolunteer(volunteer.volunteer_id, volunteer.assignment_id);
         
         // Membuat peringatan baru jika memenuhi kondisi tertentu
         if (type !== null) {
@@ -52,6 +49,7 @@ const createMonitoringData = async (req, res) => {
             if (shouldCreateAlert) {
                 const alertData = {
                     volunteer_id: volunteer.volunteer_id,
+                    assignment_id: volunteer.assignment_id,
                     type,
                     severity,
                     fatigue_score,
@@ -63,10 +61,10 @@ const createMonitoringData = async (req, res) => {
                     test_id: req.body.test_id,
                 };
 
-                await alertRepository.createAlert(alertData);
+                const alertId = await alertRepository.createAlert(alertData);
 
                 // Mengirimkan notifikasi peringatan baru melalui socket real-time
-                io.emit("alert:new", alertData);
+                io.emit("alert:new", { alert_id: alertId, ...alertData });
             }
         }
 
@@ -90,8 +88,10 @@ const createMonitoringData = async (req, res) => {
 const simulateMonitoringData = async (req, res) => {
     try {
         const { processIncomingData } = require("../../services/serialService");
-        await processIncomingData(req.body);
-
+        const result = await processIncomingData(req.body);
+        if (!result?.accepted) {
+            return res.status(400).json({ success: false, message: result?.reason || 'Paket ditolak.' });
+        }
         return res.status(200).json({
             success: true,
             message: "Simulator data processed successfully",

@@ -4,6 +4,7 @@ const pool = require("../../config/database");
 const createMonitoringData = async (monitoringData) => {
     const {
         device_id,
+        assignment_id,
         heart_rate,
         spo2,
         temperature,
@@ -19,6 +20,7 @@ const createMonitoringData = async (monitoringData) => {
         INSERT INTO MonitoringData
         (
             device_id,
+            assignment_id,
             heart_rate,
             spo2,
             temperature,
@@ -28,10 +30,11 @@ const createMonitoringData = async (monitoringData) => {
             activity_status,
             timestamp
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `,
         [
             device_id,
+            assignment_id,
             heart_rate,
             spo2,
             temperature,

@@ -5,7 +5,7 @@ export interface Alert {
     volunteer_id: string;
     volunteer_name: string;
     type: "Fall Detection" | "Fatigue Detection";
-    severity: VolunteerStatus;
+    severity: Exclude<VolunteerStatus, 'No Data'>;
     fatigue_score: number;
     fall_detected: boolean;
     heart_rate: number;

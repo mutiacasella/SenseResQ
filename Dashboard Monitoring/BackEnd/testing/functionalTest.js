@@ -142,7 +142,7 @@ const PROGRESSION = [
 
     // Kondisi normal
     {
-        device_id: 'DEV001',
+        device_id: 'DEV999',
         heart_rate: 75,
         spo2: 98,
         temperature: 36.8,
@@ -152,7 +152,7 @@ const PROGRESSION = [
 
     // Kondisi warning
     {
-        device_id: 'DEV001',
+        device_id: 'DEV999',
         heart_rate: 178,
         spo2: 97,
         temperature: 36.8,
@@ -162,7 +162,7 @@ const PROGRESSION = [
 
     // Kondisi high risk
     {
-        device_id: 'DEV001',
+        device_id: 'DEV999',
         heart_rate: 181,
         spo2: 93,
         temperature: 36.8,
@@ -172,7 +172,7 @@ const PROGRESSION = [
 
     // Kondisi critical
     {
-        device_id: 'DEV001',
+        device_id: 'DEV999',
         heart_rate: 179,
         spo2: 92,
         temperature: 38.5,
@@ -182,7 +182,7 @@ const PROGRESSION = [
 
     // Kondisi fall detection - Emergency
     {
-        device_id: 'DEV001',
+        device_id: 'DEV999',
         heart_rate: 189,
         spo2: 91,
         temperature: 38.2,
@@ -268,7 +268,7 @@ const runProgression = async () => {
 
         i = (i + 1) % PROGRESSION.length;
 
-    }, 3000);
+    }, 1000);
 };
 
 // Menentukan mode berdasarkan argument command line

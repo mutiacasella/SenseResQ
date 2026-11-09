@@ -3,7 +3,13 @@ const deviceRepository = require("./device.repository");
 // Menambahkan data perangkat baru
 const createDevice = async (req, res) => {
     try {
-        const { device_id } = req.body;
+        const { device_id } = req.body ?? {};
+        if (typeof device_id !== 'string' || !/^[A-Za-z0-9_-]{1,10}$/.test(device_id)) {
+            return res.status(400).json({ success: false, message: 'ID perangkat wajib 1–10 karakter (huruf, angka, - atau _).' });
+        }
+        if (await deviceRepository.getDeviceById(device_id)) {
+            return res.status(409).json({ success: false, message: 'ID perangkat sudah terdaftar.' });
+        }
         await deviceRepository.createDevice(device_id);
 
         return res.status(201).json({
@@ -14,9 +20,9 @@ const createDevice = async (req, res) => {
     catch (error) {
         console.error(error);
 
-        return res.status(500).json({
+        return res.status(error.code === 'ER_DUP_ENTRY' ? 409 : 500).json({
             success: false,
-            message: error.message,
+            message: error.code === 'ER_DUP_ENTRY' ? 'ID perangkat sudah terdaftar.' : 'Gagal mengelola data perangkat.',
         });
     }
 };
